@@ -22,8 +22,13 @@ class BannerMaxView extends StatelessWidget {
     BannerAdSize.leader: 'LEADER',
     BannerAdSize.mrec: 'MREC'
   };
-  final Map<BannerAdSize, BannerPx> sizesNum = {
-    BannerAdSize.banner:  BannerPx(350, 50),
+  final Map<BannerAdSize, BannerPx> sizesNumMobile = {
+    BannerAdSize.banner:  BannerPx(320, 50),
+    BannerAdSize.leader: BannerPx(double.infinity, 50),
+    BannerAdSize.mrec: BannerPx(300, 250)
+  };
+  final Map<BannerAdSize, BannerPx> sizesNumIpad = {
+    BannerAdSize.banner:  BannerPx(320, 90),
     BannerAdSize.leader: BannerPx(double.infinity, 90),
     BannerAdSize.mrec: BannerPx(300, 250)
   };
@@ -44,10 +49,22 @@ class BannerMaxView extends StatelessWidget {
           channel.setMethodCallHandler(
                   (MethodCall call) async => FlutterApplovinMax.handleMethod(call, listener));
         });
+
+    final UiKitView uiKitView = UiKitView(
+        viewType: '/Banner',
+        creationParams: {'Size': sizes[size], 'UnitId' : adUnitId},
+        layoutDirection: TextDirection.ltr,
+        creationParamsCodec: const StandardMessageCodec(),
+        onPlatformViewCreated: (int i) {
+          const MethodChannel channel = MethodChannel('AppLovin');
+          channel.setMethodCallHandler(
+          (MethodCall call) async => FlutterApplovinMax.handleMethod(call, listener));
+        });
+    final bool ipad =  MediaQuery.of(context).size.shortestSide > 600 && Platform.isIOS;
     return Container(
-      width: sizesNum[size]?.width,
-      height: sizesNum[size]?.height,
-      child: Platform.isAndroid ? androidView : null
+      width: sizesNumMobile[size]?.width,
+      height: ipad ? sizesNumIpad[size]?.height : sizesNumMobile[size]?.height,
+      child: Platform.isAndroid ? androidView : uiKitView
     );
   }
 }
