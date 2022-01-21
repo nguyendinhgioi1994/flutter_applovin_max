@@ -12,12 +12,14 @@ public class SwiftFlutterApplovinMaxPlugin:  NSObject, FlutterPlugin {
         globalMethodChannel = FlutterMethodChannel(name: "flutter_applovin_max", binaryMessenger: registrar.messenger())
         let instance = SwiftFlutterApplovinMaxPlugin()
         registrar.addMethodCallDelegate(instance, channel: globalMethodChannel!)
+        
+        let factory = BannerFactory(messenger: registrar.messenger())
+        registrar.register(factory, withId: "/Banner")
         ALSdk.shared()!.mediationProvider = ALMediationProviderMAX
         ALSdk.shared()!.initializeSdk(completionHandler: { configuration in
             // AppLovin SDK is initialized, start loading ads now or later if ad gate is reached
         })
     }
-
     public func handle(_ call: FlutterMethodCall, result: @escaping FlutterResult) {
         switch call.method {
         /*Reward*/
